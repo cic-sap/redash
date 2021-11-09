@@ -216,6 +216,7 @@ class VisualizationWidget extends React.Component {
     isPublic: PropTypes.bool,
     isLoading: PropTypes.bool,
     canEdit: PropTypes.bool,
+    tableLayout: PropTypes.bool,
     isEditing: PropTypes.bool,
     onLoad: PropTypes.func,
     onRefresh: PropTypes.func,
@@ -274,13 +275,17 @@ class VisualizationWidget extends React.Component {
   };
 
   renderVisualization() {
-    const { widget, filters } = this.props;
+    const { widget, filters,tableLayout } = this.props;
     const widgetQueryResult = widget.getQueryResult();
     const widgetStatus = widgetQueryResult && widgetQueryResult.getStatus();
+    let style=null
+    if(tableLayout){
+      style={'position':'static','height':'100%'}
+    }
     switch (widgetStatus) {
       case "failed":
         return (
-          <div className="body-row-auto scrollbox">
+          <div className="body-row-auto scrollbox" style={style}>
             {widgetQueryResult.getError() && (
               <div className="alert alert-danger m-5">
                 Error running query: <strong>{widgetQueryResult.getError()}</strong>
@@ -290,7 +295,7 @@ class VisualizationWidget extends React.Component {
         );
       case "done":
         return (
-          <div className="body-row-auto scrollbox">
+          <div className="body-row-auto scrollbox" style={style}>
             <VisualizationRenderer
               visualization={widget.visualization}
               queryResult={widgetQueryResult}

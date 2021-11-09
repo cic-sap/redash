@@ -175,6 +175,7 @@ function DashboardControl({ dashboardConfiguration, headerExtra }) {
     fullscreen,
     toggleFullscreen,
     showShareDashboardDialog,
+    showEmailDashboardDialog,
   } = dashboardConfiguration;
   const showPublishButton = dashboard.is_draft;
   const showRefreshButton = true;
@@ -213,6 +214,18 @@ function DashboardControl({ dashboardConfiguration, headerExtra }) {
                 data-test="OpenShareForm"
                 aria-label="Share">
                 <i className="zmdi zmdi-share" aria-hidden="true" />
+              </Button>
+            </Tooltip>
+          )}
+          {showShareButton && (
+            <Tooltip title="Subscribe to the dashboard via email">
+              <Button
+                className="icon-button m-l-5"
+                type={buttonType(dashboard.publicAccessEnabled)}
+                onClick={showEmailDashboardDialog}
+                data-test="subscription"
+                aria-label="subscription">
+                <i className="zmdi zmdi-email" aria-hidden="true" />
               </Button>
             </Tooltip>
           )}

@@ -70,6 +70,7 @@ class Widget extends React.Component {
     footer: PropTypes.node,
     canEdit: PropTypes.bool,
     isPublic: PropTypes.bool,
+    tableLayout: PropTypes.bool,
     refreshStartedAt: Moment,
     menuOptions: PropTypes.node,
     tileProps: PropTypes.object, // eslint-disable-line react/forbid-prop-types
@@ -109,7 +110,10 @@ class Widget extends React.Component {
   };
 
   render() {
-    const { className, children, header, footer, canEdit, isPublic, menuOptions, tileProps } = this.props;
+    const { className, children, header, footer, canEdit, isPublic, menuOptions, tileProps,tableLayout } = this.props;
+    if(tableLayout){
+      tileProps['style']={'position':'relative'}
+    }
     const showDropdownButton = !isPublic && (canEdit || !isEmpty(menuOptions));
     return (
       <div className="widget-wrapper">
