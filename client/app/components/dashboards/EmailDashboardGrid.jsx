@@ -75,7 +75,7 @@ const EmailDashboardWidget = React.memo(
       );
     }
     if (type === WidgetTypeEnum.TEXTBOX) {
-      return <TextboxWidget widget={widget} tableLayout={tableLayout} canEdit={canEdit} isPublic={isPublic} onDelete={onDelete}/>;
+      return <TextboxWidget widget={widget} height={height} tableLayout={tableLayout} canEdit={canEdit} isPublic={isPublic} onDelete={onDelete}/>;
     }
     return <RestrictedWidget widget={widget} tableLayout={tableLayout}  />;
   },
