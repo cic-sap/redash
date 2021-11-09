@@ -173,7 +173,15 @@ class TableLayout extends React.Component {
 
     //rowHeight
     return (
-      <table width={"100%"} className={"email-table-layout"}        >
+      <table width={1020} className={"email-table-layout"} id="table_width">
+        <thead>
+          <th width={170}></th>
+          <th width={170}></th>
+          <th width={170}></th>
+          <th width={170}></th>
+          <th width={170}></th>
+          <th width={170}></th>
+        </thead>
         <tbody>
         {
           rows.map((cols,rowIndex)=>{

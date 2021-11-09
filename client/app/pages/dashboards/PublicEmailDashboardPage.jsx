@@ -38,7 +38,7 @@ function PublicEmailDashboard({ dashboard }) {
           <Filters filters={filters} onChange={setFilters} />
         </div>
       )}
-      <div id="dashboard-container">
+      <div>
         <EmailDashboardGrid
           dashboard={dashboard}
           widgets={dashboard.widgets}
