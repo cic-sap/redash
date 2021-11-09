@@ -173,14 +173,14 @@ class TableLayout extends React.Component {
 
     //rowHeight
     return (
-      <table width={1020} className={"email-table-layout"} id="table_width">
+      <table width='100%' className={"email-table-layout"} id="table_width">
         <thead>
-          <th width={170}></th>
-          <th width={170}></th>
-          <th width={170}></th>
-          <th width={170}></th>
-          <th width={170}></th>
-          <th width={170}></th>
+          <th width={100.0/6+'%'}></th>
+          <th width={100.0/6+'%'}></th>
+          <th width={100.0/6+'%'}></th>
+          <th width={100.0/6+'%'}></th>
+          <th width={100.0/6+'%'}></th>
+          <th width={100.0/6+'%'}></th>
         </thead>
         <tbody>
         {
@@ -189,7 +189,7 @@ class TableLayout extends React.Component {
 
               {cols.map((col,colIndex)=>{
                 return (
-                  <td key={'col'+colIndex} colSpan={col.w} rowSpan={col.h} >
+                  <td key={'col'+colIndex} colSpan={col.w} style={{height:this.props.rowHeight*col.h}}  rowSpan={col.h} >
                     {keyMap[col.i]?keyMap[col.i]:null}
                   </td>
                 )
@@ -262,11 +262,12 @@ class EmailDashboardGrid extends DashboardGrid {
           draggableCancel="input,.sortable-container"
           className={cx("layout", {"disable-animations": this.state.disableAnimations})}
           cols={{[MULTI]: cfg.columns, [SINGLE]: 1}}
-          rowHeight={cfg.rowHeight - cfg.margins}
+          rowHeight={cfg.rowHeight}
           margin={[cfg.margins, cfg.margins]}
           isDraggable={isEditing}
           isResizable={isEditing}
           widgets={widgets}
+
           onResizeStart={this.autoHeightCtrl.stop}
           onResizeStop={this.onWidgetResize}
           layouts={this.state.layouts}

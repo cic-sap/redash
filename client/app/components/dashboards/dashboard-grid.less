@@ -8,6 +8,7 @@
 
   .tile {
     display: flex;
+    flex-direction: column!important;
     position: absolute;
     left: 0;
     top: 0;
@@ -191,7 +192,8 @@ table.email-table-layout {
   display: none;
 }
 .email-table-layout   .tile{
-  display: block!important;
+  //display: block!important;
+  position: static;
 }
 
 .email-table-layout .modebar{
@@ -200,17 +202,15 @@ table.email-table-layout {
 
 .email-table-layout .body-row-auto{
   display: block;
-  flex:none!important;
-}
-.email-table-layout .body-row-auto{
-  flex:none!important;
+  //flex:none!important;
+  position: static;
 }
 .email-table-layout .body-row{
   flex:none!important;
 }
 .email-table-layout .widget-header{
-  display: block;
-  flex:none!important;
+  //display: block;
+  //flex:none!important;
 }
 
 .email-table-layout .tile{
@@ -220,6 +220,9 @@ table.email-table-layout {
   position: static!important;
   height: 100%;
 }
+//.email-table-layout .widget-wrapper .tile {
+//  overflow: visible!important;
+//}
 .email-table-layout .widget-wrapper{
   height: 100%;
 }

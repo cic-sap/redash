@@ -109,12 +109,41 @@ class Widget extends React.Component {
     });
   };
 
+  renderTableLayout(){
+    const { className, children, header, footer, tileProps } = this.props;
+
+    return (
+      <div className="widget-wrapper">
+        <div className={cx("tile body-container", className)} {...tileProps}>
+        <table style={{height:'100%'}}>
+          <tbody>
+          <tr>
+            <td height={40}><div className="body-row widget-header">{header}</div></td>
+          </tr>
+          <tr>
+            <td  height={'200'}>
+                {children}
+            </td>
+          </tr>
+          {footer && (
+            <tr>
+            <td  height={40}>
+              <div className="body-row tile__bottom-control">{footer}</div>
+            </td>
+          </tr>
+          )}
+          </tbody>
+        </table>
+        </div>
+      </div>
+    );
+  }
   render() {
-    const { className, children, header, footer, canEdit, isPublic, menuOptions, tileProps,tableLayout } = this.props;
-    if(tableLayout){
-      tileProps['style']={'position':'relative'}
-    }
+    const { className, children, header, footer, canEdit, isPublic, menuOptions, tileProps } = this.props;
     const showDropdownButton = !isPublic && (canEdit || !isEmpty(menuOptions));
+    if(this.props.tableLayout){
+      return this.renderTableLayout()
+    }
     return (
       <div className="widget-wrapper">
         <div className={cx("tile body-container", className)} {...tileProps}>

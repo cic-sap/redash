@@ -113,6 +113,13 @@
         for (let i = 0; i < div2.length; i++) {
             div2[i].parentElement.removeChild(div2[i]);
         }
+
+        let inject = document.querySelectorAll('div.widget-visualization');
+        for (let i = 0; i < inject.length; i++) {
+          inject[i].style.flexDirection='column';
+
+        }
+
     }
     clean_elements()
 

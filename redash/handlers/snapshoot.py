@@ -147,15 +147,33 @@ def run():
         options=webdriver.ChromeOptions(),
     )
     driver.get(public_url)
+
     time.sleep(3)
-    eles = driver.find_elements(by=By.CLASS_NAME, value='svg-container')
+
+    eles = driver.find_elements(by=By.CLASS_NAME, value='visualization-renderer')
+    # eles = driver.find_elements(by=By.CLASS_NAME, value='svg-container')
+    print('find ele',len(eles))
     for i, ele in enumerate(eles):
         print('rect', i, ele.rect)
+
+        check = ele.find_elements(by=By.CLASS_NAME, value='svg-container')
+        if len(check) == 0:
+            print('pass',i)
+            continue
+
+        js = '''
+                 let div  = document.querySelectorAll('div.visualization-renderer')[arguments[0]];
+                div.scrollIntoView()
+                '''
+        print('js', js)
+        driver.execute_script(js, i,)
+        time.sleep(1)
+        print('snap')
         data = ele.screenshot_as_base64
         print('base64', len(data))
         js = '''
-         let div  = document.querySelectorAll('div.svg-container')[arguments[0]];
-        div.innerHTML='<img src="data:image/png;base64, '+arguments[1]+'" width="100%" />'
+         let div  = document.querySelectorAll('div.visualization-renderer')[arguments[0]];
+        div.innerHTML='<img style="max-height:100%;" width="100%" src="data:image/png;base64, '+arguments[1]+'" />'
         '''
         print('js', js)
         driver.execute_script(js, i, data)
