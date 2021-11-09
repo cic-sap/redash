@@ -175,7 +175,8 @@ class TableLayout extends React.Component {
 
     //rowHeight
     return (
-      <table width='100%' className={"email-table-layout"} id="table_width">
+
+       <table width='100%'  className={"email-table-layout"} id="table_width">
         <thead>
           <th width={100.0/6+'%'}></th>
           <th width={100.0/6+'%'}></th>
@@ -201,6 +202,8 @@ class TableLayout extends React.Component {
         }
         </tbody>
       </table>
+
+
     )
 
   }

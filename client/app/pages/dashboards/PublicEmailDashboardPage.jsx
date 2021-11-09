@@ -27,7 +27,17 @@ function PublicEmailDashboard({ dashboard }) {
 
   return (
     <div className="container p-t-10 p-b-20">
-      <h3>{dashboard.name}</h3>
+
+       <table style={{'width':'100%',height:'100%'}}>
+        <tr>
+          <td valign={"center"} align={"center"}>
+
+            <table style={{width:'900px'}}>
+              <tr>
+                <td align={"left"}>
+      <h3 style={{'textAlign':'left'}}>{dashboard.name}</h3>
+            </td></tr></table>
+
       {!isEmpty(globalParameters) && (
         <p style={"clean:both"}>
           <Parameters parameters={globalParameters} onValuesChange={refreshDashboard} />
@@ -49,6 +59,7 @@ function PublicEmailDashboard({ dashboard }) {
           onRefreshWidget={refreshWidget}
         />
       </div>
+            </td></tr></table>
     </div>
   );
 }
