@@ -111,23 +111,24 @@ class Widget extends React.Component {
 
   renderTableLayout(){
     const { className, children, header, footer, tileProps } = this.props;
-
     return (
       <div className="widget-wrapper">
         <div className={cx("tile body-container", className)} {...tileProps}>
-        <table style={{height:this.props.height}}>
+        <table style={{height:'100%'}} className="table-widget-wrappe">
           <tbody>
+          {header && (
           <tr>
-            <td height={40}><div className="body-row widget-header">{header}</div></td>
+            <td height={60}><div className="body-row widget-header">{header}</div></td>
           </tr>
+          )}
           <tr>
-            <td  height={'200'}>
-                {children}
+            <td className="widget-body-td">
+              {children}
             </td>
           </tr>
           {footer && (
             <tr>
-            <td  height={40}>
+            <td height={50}>
               <div className="body-row tile__bottom-control">{footer}</div>
             </td>
           </tr>
