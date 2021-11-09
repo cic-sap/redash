@@ -36,6 +36,7 @@ const MULTI = "multi-column";
 
 const EmailDashboardWidget = React.memo(
   function EmailDashboardWidget({
+                                  height,
                                   widget,
                                   dashboard,
                                   onLoadWidget,
@@ -58,6 +59,7 @@ const EmailDashboardWidget = React.memo(
       return (
         <VisualizationWidget
           widget={widget}
+          height={height}
           tableLayout={tableLayout}
           dashboard={dashboard}
           filters={filters}
@@ -293,6 +295,7 @@ class EmailDashboardGrid extends DashboardGrid {
                 dashboard={dashboard}
                 widget={widget}
                 filters={filters}
+                height={cfg.rowHeight *widget.options.position.sizeY - cfg.margins}
                 isPublic={isPublic}
                 isLoading={widget.loading}
                 isEditing={false}

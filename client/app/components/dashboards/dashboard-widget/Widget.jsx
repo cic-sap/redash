@@ -115,7 +115,7 @@ class Widget extends React.Component {
     return (
       <div className="widget-wrapper">
         <div className={cx("tile body-container", className)} {...tileProps}>
-        <table style={{height:'100%'}}>
+        <table style={{height:this.props.height}}>
           <tbody>
           <tr>
             <td height={40}><div className="body-row widget-header">{header}</div></td>
