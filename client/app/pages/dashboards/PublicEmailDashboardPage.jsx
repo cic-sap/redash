@@ -28,13 +28,13 @@ function PublicEmailDashboard({dashboard}) {
   return (
     <div className="container p-t-10 p-b-20">
 
-      <table style={{'width': '100%', height: '100%'}}>
+      <table style={{'width': '100%', height: '100%', backgroundColor: "#f6f8f9"}}>
         <tr>
           <td valign={"top"} align={"center"}>
 
             <table style={{width: '900px'}}>
               <tr>
-                <td align={"left"}>
+                <td align={"left"} style={{backgroundColor: "#f6f8f9"}}>
                   <h3 style={{'textAlign': 'left'}}>{dashboard.name}</h3>
                 </td>
               </tr>
