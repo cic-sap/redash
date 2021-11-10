@@ -30,12 +30,12 @@ function PublicEmailDashboard({ dashboard }) {
 
        <table style={{'width':'100%',height:'100%'}}>
         <tr>
-          <td valign={"center"} align={"center"}>
+          <td valign={"top"} align={"center"}>
 
             <table style={{width:'900px'}}>
               <tr>
                 <td align={"left"}>
-      <h3 style={{'textAlign':'left'}}>{dashboard.name}</h3>
+                  <h3 style={{'textAlign':'left'}}>{dashboard.name}</h3>
             </td></tr></table>
 
       {!isEmpty(globalParameters) && (

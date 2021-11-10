@@ -162,7 +162,7 @@ def run():
             continue
 
         js = '''
-                 let div  = document.querySelectorAll('div.visualization-renderer')[arguments[0]];
+                let div  = document.querySelectorAll('div.visualization-renderer')[arguments[0]];
                 div.scrollIntoView()
                 '''
         print('js', js)

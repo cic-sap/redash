@@ -145,7 +145,7 @@ class Widget extends React.Component {
     if(this.props.tableLayout){
       return this.renderTableLayout()
     }
-    
+
     return (
       <div className="widget-wrapper">
         <div className={cx("tile body-container", className)} {...tileProps}>

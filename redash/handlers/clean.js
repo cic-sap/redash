@@ -135,9 +135,6 @@
                         filename = location.href + '-' + (new Date()).toISOString() + '.html';
                         download(filename, text);
 
-                        sendResponse({
-                            ok: true
-                        });
                     })
                     .onerror(function(reason) {
                         console.log(`SNAPSHOT AS HTML ERROR: ${reason}`);
