@@ -38,18 +38,29 @@ function PublicEmailDashboard({dashboard}) {
                   <h3 style={{'textAlign': 'left'}}>{dashboard.name}</h3>
                 </td>
               </tr>
+            {!isEmpty(globalParameters) && (
+              <tr>
+                <td align={"left"}>
+                  <p style={{clean:'both','textAlign':'left'}}>
+                    <Parameters parameters={globalParameters} onValuesChange={refreshDashboard}/>
+                  </p>
+                  </td>
+              </tr>
+            )}
+                 {!isEmpty(filters) && (
+              <tr>
+                <td align={"left"}>
+                    <div className="m-b-10 p-15 bg-white tiled">
+                      <Filters filters={filters} onChange={setFilters}/>
+                    </div>
+                   </td>
+              </tr>
+            )}
+
             </table>
 
-            {!isEmpty(globalParameters) && (
-              <p style={"clean:both"}>
-                <Parameters parameters={globalParameters} onValuesChange={refreshDashboard}/>
-              </p>
-            )}
-            {!isEmpty(filters) && (
-              <div className="m-b-10 p-15 bg-white tiled">
-                <Filters filters={filters} onChange={setFilters}/>
-              </div>
-            )}
+
+
             <div>
               <EmailDashboardGrid
                 dashboard={dashboard}

@@ -141,7 +141,9 @@ def get_js():
 })()
     '''
 def run():
-    public_url = 'http://localhost:8080/public/email-dashboards/czUPwJVQW09FwJr7pQl6kI2PuqqySnfvjwwWT2cv?org_slug=default'
+    # public_url = 'http://localhost:8080/public/email-dashboards/czUPwJVQW09FwJr7pQl6kI2PuqqySnfvjwwWT2cv?org_slug=default'
+    public_url = 'http://localhost:8080/public/dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
+    public_url = 'http://localhost:8080/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
     driver = webdriver.Remote(
         command_executor='http://127.0.0.1:4444/wd/hub',
         options=webdriver.ChromeOptions(),
