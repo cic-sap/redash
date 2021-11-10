@@ -27,11 +27,9 @@ function PublicEmailDashboard({dashboard}) {
 
   return (
     <div className="container p-t-10 p-b-20">
-
       <table style={{'width': '100%', height: '100%', backgroundColor: "#f6f8f9"}}>
         <tr>
           <td valign={"top"} align={"center"}>
-
             <table style={{width: '900px'}}>
               <tr>
                 <td align={"left"} style={{backgroundColor: "#f6f8f9"}}>
@@ -42,12 +40,12 @@ function PublicEmailDashboard({dashboard}) {
               <tr>
                 <td align={"left"}>
                   <p style={{clean:'both','textAlign':'left'}}>
-                    <Parameters parameters={globalParameters} onValuesChange={refreshDashboard}/>
+                    <Parameters tableLayout={true} parameters={globalParameters} onValuesChange={refreshDashboard}/>
                   </p>
                   </td>
               </tr>
             )}
-                 {!isEmpty(filters) && (
+            {!isEmpty(filters) && (
               <tr>
                 <td align={"left"}>
                     <div className="m-b-10 p-15 bg-white tiled">
@@ -58,9 +56,7 @@ function PublicEmailDashboard({dashboard}) {
             )}
 
             </table>
-
-
-
+            
             <div>
               <EmailDashboardGrid
                 dashboard={dashboard}

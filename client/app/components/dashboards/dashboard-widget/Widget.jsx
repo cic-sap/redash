@@ -118,7 +118,7 @@ class Widget extends React.Component {
           <tbody>
           {header && (
           <tr>
-            <td height={60}><div className="body-row widget-header">{header}</div></td>
+            <td height={60}><div className="body-row widget-header" style={{padding: '10px'}}>{header}</div></td>
           </tr>
           )}
           <tr>

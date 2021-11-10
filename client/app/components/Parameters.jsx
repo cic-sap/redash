@@ -25,6 +25,7 @@ export default class Parameters extends React.Component {
     parameters: PropTypes.arrayOf(PropTypes.instanceOf(Parameter)),
     editable: PropTypes.bool,
     sortable: PropTypes.bool,
+    tableLayout: PropTypes.bool,
     disableUrlUpdate: PropTypes.bool,
     onValuesChange: PropTypes.func,
     onPendingValuesChange: PropTypes.func,
@@ -36,6 +37,7 @@ export default class Parameters extends React.Component {
     parameters: [],
     editable: false,
     sortable: false,
+    tableLayout: false,
     disableUrlUpdate: false,
     onValuesChange: () => {},
     onPendingValuesChange: () => {},
@@ -138,7 +140,9 @@ export default class Parameters extends React.Component {
             </PlainButton>
           )}
         </div>
-        <ParameterValueInput
+        {
+          this.props.tableLayout ? (<div><b>{param.normalizedValue}</b></div>) : (
+          <ParameterValueInput
           type={param.type}
           value={param.normalizedValue}
           parameter={param}
@@ -146,6 +150,8 @@ export default class Parameters extends React.Component {
           queryId={param.queryId}
           onSelect={(value, isDirty) => this.setPendingValue(param, value, isDirty)}
         />
+          )
+        }
       </div>
     );
   }
@@ -157,6 +163,7 @@ export default class Parameters extends React.Component {
 
     return (
       <SortableContainer
+        style={{verticalAlign: 'center'}}
         disabled={!sortable}
         axis="xy"
         useDragHandle
@@ -172,6 +179,7 @@ export default class Parameters extends React.Component {
         {parameters.map((param, index) => (
           <SortableElement key={param.name} index={index}>
             <div
+              style={{paddingLeft: '10px', paddingTop: '10px'}}
               className="parameter-block"
               data-editable={sortable || null}
               data-test={`ParameterBlock-${param.name}`}>
@@ -180,7 +188,12 @@ export default class Parameters extends React.Component {
             </div>
           </SortableElement>
         ))}
-        <ParameterApplyButton onClick={this.applyChanges} paramCount={dirtyParamCount} />
+
+        {
+          !this.props.tableLayout && (
+            <ParameterApplyButton onClick={this.applyChanges} paramCount={dirtyParamCount} />
+          )
+        }
       </SortableContainer>
     );
   }
