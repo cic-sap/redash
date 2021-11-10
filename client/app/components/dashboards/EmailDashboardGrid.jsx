@@ -192,7 +192,7 @@ class TableLayout extends React.Component {
 
               {cols.map((col,colIndex)=>{
                 return (
-                  <td key={'col'+colIndex} colSpan={col.w} style={{height:this.props.rowHeight*col.h}}  rowSpan={col.h} >
+                  <td valign={"top"} key={'col'+colIndex} colSpan={col.w} style={{height:this.props.rowHeight*col.h}}  rowSpan={col.h} >
                     {keyMap[col.i]?keyMap[col.i]:null}
                   </td>
                 )
