@@ -117,30 +117,21 @@
         let inject = document.querySelectorAll('div.widget-visualization');
         for (let i = 0; i < inject.length; i++) {
           inject[i].style.flexDirection='column';
-
         }
-
     }
+
     clean_elements()
 
+    inlineSameOriginExternalStyles()
+        .then(function() {
+            let text = getHTML();
+            text = omitScript(text);
+            text = omitIframeSrc(text);
+            text = normalizeURL(text);
 
-    {
-                inlineSameOriginExternalStyles()
-                    .then(function() {
-                        text = getHTML();
-                        text = omitScript(text);
-                        text = omitIframeSrc(text);
-                        text = normalizeURL(text);
-
-                        filename = location.href + '-' + (new Date()).toISOString() + '.html';
-                        download(filename, text);
-
-                    })
-                    .onerror(function(reason) {
-                        console.log(`SNAPSHOT AS HTML ERROR: ${reason}`);
-                    });
-            }
-
-
+            window.last_html = text
+            let filename = location.href + '-' + (new Date()).toISOString() + '.html';
+            download(filename, text);
+        })
 
 })()
