@@ -1,4 +1,5 @@
 import os.path
+import smtplib
 import time
 
 from selenium.webdriver.common.by import By
@@ -21,13 +22,19 @@ def run():
     public_url = 'http://localhost:8080/public/dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
     public_url = 'http://localhost:8080/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
     public_url = 'http://server:5000/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
+    webserver = 'http://127.0.0.1:4440/wd/hub'
     options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
+    if False:
+        public_url = 'http://localhost:8080/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
+        public_url = 'http://localhost:5001/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
+        webserver = 'http://127.0.0.1:4444/wd/hub'
+    else:
+        options.add_argument('--headless')
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-gpu")
-    options.add_argument("--window-size=1200x1200")
+    options.add_argument("--window-size=1200x1600")
     driver = webdriver.Remote(
-        command_executor='http://127.0.0.1:4440/wd/hub',
+        command_executor=webserver,
         options=options,
     )
     try:
@@ -36,9 +43,10 @@ def run():
         screen = 'new-%d.png' % time.time()
         print('screen', screen)
         driver.save_screenshot(screen)
-        element = WebDriverWait(driver, 30).until(
+        element = WebDriverWait(driver, 300).until(
             EC.presence_of_element_located((By.TAG_NAME, "h3"))
         )
+        title = element.get_attribute('innerHTML')
         print('dashboard title:', element.get_attribute('innerHTML'))
 
         screen = 'new-%d.png' % time.time()
@@ -84,14 +92,15 @@ def run():
             driver.execute_script(get_js())
             for i in range(30):
                 time.sleep(1)
-                html = driver.execute_script('return window.last_html')
-                if html == "":
+                html = driver.execute_script('return window.last_html').strip()
+                if len(html)<200:
                     print('wait html snapshot')
                     continue
                 f = 'test-%d.html' % time.time()
                 print('write', f)
                 with open(f, 'w', encoding='utf-8') as fp:
                     fp.write(html)
+                send_mail(title, html)
                 break
         except:
             pass
@@ -99,8 +108,42 @@ def run():
 
         return {'public_url': public_url}
     finally:
+        time.sleep(15)
         driver.quit()
 
 
+def send_mail(title, html):
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+
+    Server = "localhost"
+    Port = 2526
+    User = "admin"
+    Password = "admin"
+
+    sender_email = "dongming.shen@sap.com"
+    receiver_email = "dongming.shen@sap.com"
+
+    message = MIMEMultipart("alternative")
+    message["Subject"] = title
+    message["From"] = sender_email
+    message["To"] = receiver_email
+    text = 'Please enable html mode'
+    part1 = MIMEText(text, "plain",_charset='utf-8')
+    part2 = MIMEText(html, "html",_charset='utf-8')
+
+    message.attach(part1)
+    message.attach(part2)
+
+    host = smtplib.SMTP(Server, Port)
+    #host.debuglevel = 1
+    # host.login(User, Password)
+    ret = host.sendmail(
+        sender_email, receiver_email, message.as_string()
+    )
+    print('sendmail result', ret)
+
+
 if __name__ == '__main__':
+    # send_mail('test',open('test-1636545528.html',encoding='utf-8').read())
     run()
