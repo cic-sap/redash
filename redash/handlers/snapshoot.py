@@ -12,7 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 def get_js():
-    with open(os.path.dirname(__file__) + '/clean.js', encoding='utf-8') as fp:
+    with open(os.path.dirname(__file__) + '/hack/clean.js', encoding='utf-8') as fp:
         text = fp.read()
         return text
 
@@ -24,11 +24,21 @@ def run():
     public_url = 'http://server:5000/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
     webserver = 'http://127.0.0.1:4440/wd/hub'
     options = webdriver.ChromeOptions()
-    if True:
-        public_url = 'http://localhost:8080/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
-        # public_url = 'http://localhost:5001/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
+    debug = False
+    if debug:
+        # public_url = 'http://localhost:8080/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
+        public_url = 'http://localhost:5001/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
         webserver = 'http://127.0.0.1:4444/wd/hub'
     else:
+        options.add_argument('--headless')
+
+    snapshot(public_url, webserver, debug)
+
+
+def snapshot(public_url, webserver, debug):
+    options = webdriver.ChromeOptions()
+    t1 = time.time()
+    if not debug:
         options.add_argument('--headless')
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-gpu")
@@ -38,11 +48,16 @@ def run():
         options=options,
     )
     try:
-        print('start ', public_url)
+        print('start ', public_url, 'webserver', webserver)
         driver.get(public_url)
         screen = 'new-%d.png' % time.time()
         print('screen', screen)
         driver.save_screenshot(screen)
+        with open(os.path.dirname(__file__)+'/hack/beautify.min.js', encoding='utf-8') as fp:
+            driver.execute_script(fp.read())
+        with open(os.path.dirname(__file__)+'/hack/beautify-css.min.js', encoding='utf-8') as fp:
+            driver.execute_script(fp.read())
+
         for i in range(10):
             element = WebDriverWait(driver, 300).until(
                 EC.presence_of_element_located((By.TAG_NAME, "h3"))
@@ -115,7 +130,7 @@ def run():
                     continue
                 print('get html snapshot ok')
                 f = 'test-%d.html' % time.time()
-                print('write', f)
+                print('write', f,'size',len(html),type(html))
                 with open(f, 'w', encoding='utf-8') as fp:
                     fp.write(html)
                 send_mail(title, html)
@@ -129,7 +144,9 @@ def run():
 
         return {'public_url': public_url}
     finally:
-        # time.sleep(1)
+        print('cost time:', time.time()-t1)
+        if debug:
+            time.sleep(1800)
         driver.quit()
 
 
@@ -143,7 +160,7 @@ def send_mail(title, html):
     Password = "admin"
 
     sender_email = "dongming.shen@sap.com"
-    receiver_email = "dongming.shen@sap.com, n.song@sap.com"
+    receiver_email = "dongming.shen@sap.com"
 
     message = MIMEMultipart("alternative")
     message["Subject"] = title

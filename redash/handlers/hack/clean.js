@@ -80,10 +80,7 @@
   function getHTML() {
     return new Promise(function (ok, reject) {
 
-      Promise.all([
-        load_js('https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify.min.js'),
-        load_js('https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify-css.min.js')
-      ]).then(function () {
+
         console.log('all js done')
         let node = document.documentElement.cloneNode(true)
         let doc = node.ownerDocument;
@@ -98,7 +95,6 @@
         setTimeout(function () {
           ok('<!doctype html>\n<!-- ' + location.href + ' -->\n' + node.outerHTML);
         }, 1000)
-      })
 
     })
 
