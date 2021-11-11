@@ -24,9 +24,9 @@ def run():
     public_url = 'http://server:5000/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
     webserver = 'http://127.0.0.1:4440/wd/hub'
     options = webdriver.ChromeOptions()
-    if False:
+    if True:
         public_url = 'http://localhost:8080/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
-        public_url = 'http://localhost:5001/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
+        # public_url = 'http://localhost:5001/public/email-dashboards/5psvb8ozcfwlfAwuvA1rSfH5ukdxegdpvPSrzyZ4?org_slug=default&p_TimeRange=LastWeek&p_project=ome'
         webserver = 'http://127.0.0.1:4444/wd/hub'
     else:
         options.add_argument('--headless')
@@ -43,17 +43,33 @@ def run():
         screen = 'new-%d.png' % time.time()
         print('screen', screen)
         driver.save_screenshot(screen)
+        for i in range(10):
+            element = WebDriverWait(driver, 300).until(
+                EC.presence_of_element_located((By.TAG_NAME, "h3"))
+            )
+            if not element:
+                print('wait title')
+                continue
+            title = element.get_attribute('innerText').strip()
+            print('dashboard title:', element.get_attribute('innerText'), element.get_attribute('innerHTML'))
+            if title == '':
+                print('wait title')
+                continue
+            break
+        if title == '':
+            raise Exception('wait title fail!')
+
         element = WebDriverWait(driver, 300).until(
-            EC.presence_of_element_located((By.TAG_NAME, "h3"))
+            EC.presence_of_element_located((By.CSS_SELECTOR, "table.email-table-layout"))
         )
-        title = element.get_attribute('innerHTML')
-        print('dashboard title:', element.get_attribute('innerHTML'))
+        print('wait email-table-layout', element)
 
         screen = 'new-%d.png' % time.time()
         print('screen', screen)
         driver.save_screenshot(screen)
 
         # //spinner
+
         out = WebDriverWait(driver, 600).until_not(
             EC.presence_of_element_located((By.CSS_SELECTOR, 'div.spinner')),
             message='wait spinner timeout'
@@ -92,17 +108,22 @@ def run():
             driver.execute_script(get_js())
             for i in range(30):
                 time.sleep(1)
-                html = driver.execute_script('return window.last_html').strip()
-                if len(html)<200:
+                html = driver.execute_script('return window.last_html')
+
+                if html is None or len(html) < 200:
                     print('wait html snapshot')
                     continue
+                print('get html snapshot ok')
                 f = 'test-%d.html' % time.time()
                 print('write', f)
                 with open(f, 'w', encoding='utf-8') as fp:
                     fp.write(html)
                 send_mail(title, html)
                 break
-        except:
+            if html is None or len(html) < 200:
+                raise Exception('wait html snapshot timeout')
+        except Exception as e:
+            print('get Exception', e)
             pass
         # driver.save_screenshot("out.png")
 
@@ -129,14 +150,14 @@ def send_mail(title, html):
     message["From"] = sender_email
     message["To"] = receiver_email
     text = 'Please enable html mode'
-    part1 = MIMEText(text, "plain",_charset='utf-8')
-    part2 = MIMEText(html, "html",_charset='utf-8')
+    part1 = MIMEText(text, "plain", _charset='utf-8')
+    part2 = MIMEText(html, "html", _charset='utf-8')
 
     message.attach(part1)
     message.attach(part2)
 
     host = smtplib.SMTP(Server, Port)
-    #host.debuglevel = 1
+    # host.debuglevel = 1
     # host.login(User, Password)
     ret = host.sendmail(
         sender_email, receiver_email, message.as_string()
@@ -145,5 +166,5 @@ def send_mail(title, html):
 
 
 if __name__ == '__main__':
-    # send_mail('test',open('test-1636545528.html',encoding='utf-8').read())
+    # send_mail('test',open('test-1636601272.html',encoding='utf-8').read())
     run()

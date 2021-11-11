@@ -63,30 +63,45 @@
   }
 
 
-  function getHTML() {
-    let node = document.documentElement.cloneNode(true)
-    let doc = node.ownerDocument;
-    let styles = node.getElementsByTagName('style');
-    for (let i = styles.length - 1; i >= 0; i--) {
-      let s = styles[i]
-      s.parentElement.removeChild(s)
-    }
-    //format css
-    (function (s, c, r, i, j) {
-        for (i = 0; i < s.length; i++) {
-          c = s[i].cssRules;
-          let text =[]
-          for (j = 0; j < c.length; j++) {
-            r = c[j].cssText;
-            text.push(r)
-          }
-          let s2 = doc.createElement('style')
-          s2.innerHTML = text.join('\n')
-          node.getElementsByTagName('head')[0].appendChild(s2)
-        }
+  function load_js(js) {
+    return new Promise(function (ok, reject) {
+      let tag = document.createElement('script')
+      tag.src = js
+      tag.onload = function () {
+        console.log('load js ok', js)
+        ok()
       }
-    )(document.styleSheets);
-    return '<!doctype html>\n<!-- ' + location.href + ' -->\n' + node.outerHTML;
+      tag.onerror = reject
+      document.getElementsByTagName('head')[0].appendChild(tag)
+    })
+  }
+
+
+  function getHTML() {
+    return new Promise(function (ok, reject) {
+
+      Promise.all([
+        load_js('https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify.min.js'),
+        load_js('https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.0/beautify-css.min.js')
+      ]).then(function () {
+        console.log('all js done')
+        let node = document.documentElement.cloneNode(true)
+        let doc = node.ownerDocument;
+        let styles = node.getElementsByTagName('style');
+        for (let i = styles.length - 1; i >= 0; i--) {
+          let s = styles[i]
+          let old = s.innerHTML
+          let newCss = css_beautify(old)
+          console.log('newCss', newCss, 'old', old)
+          s.innerHTML = newCss
+        }
+        setTimeout(function () {
+          ok('<!doctype html>\n<!-- ' + location.href + ' -->\n' + node.outerHTML);
+        }, 1000)
+      })
+
+    })
+
   }
 
 
@@ -146,14 +161,17 @@
 
   inlineSameOriginExternalStyles()
     .then(function () {
-      let text = getHTML();
-      text = omitScript(text);
-      text = omitIframeSrc(text);
-      text = normalizeURL(text);
+      getHTML().then(function (text) {
+        text = omitScript(text);
+        text = omitIframeSrc(text);
+        text = normalizeURL(text);
 
-      window.last_html = text
-      let filename = location.href + '-' + (new Date()).toISOString() + '.html';
-      download(filename, text);
+        window.last_html = text
+        let filename = location.href + '-' + (new Date()).toISOString() + '.html';
+        download(filename, text);
+
+      });
+
     })
 
 })()
