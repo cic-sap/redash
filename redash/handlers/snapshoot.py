@@ -129,7 +129,7 @@ def run():
 
         return {'public_url': public_url}
     finally:
-        time.sleep(15)
+        # time.sleep(1)
         driver.quit()
 
 
@@ -143,7 +143,7 @@ def send_mail(title, html):
     Password = "admin"
 
     sender_email = "dongming.shen@sap.com"
-    receiver_email = "dongming.shen@sap.com"
+    receiver_email = "dongming.shen@sap.com, n.song@sap.com"
 
     message = MIMEMultipart("alternative")
     message["Subject"] = title
