@@ -15,11 +15,6 @@
   }
 
 
-  /**
-   * 简单的 xhr get 请求
-   * @param {String} url
-   * @return {Promise}
-   */
   function simpleGet(url) {
     return new Promise(function (resolve, reject) {
       const xhr = new XMLHttpRequest();
@@ -49,6 +44,7 @@
       });
     return Promise.all(styles.map(function (node) {
       const url = node.href;
+      console.log('load css url:',url)
       return simpleGet(url)
         .then(function (value) {
           const c = document.createComment(url)
@@ -76,25 +72,166 @@
     })
   }
 
+  function split_css(css, buf, max_length) {
+    top1:
+      while (css.length > max_length) {
+        for (let i = max_length; i > 0; i--) {
+          if (css.substr(i, 2) == '}\n') {
+            let text = css.substr(0, i + 2)
+            if (text.length > 0) {
+              buf.push(text)
+            }
+            css = css.substr(i + 2)
+            continue top1
+          }
+        }
+        break
+      }
+    if (css.length > 0) {
+      buf.push(css)
+    }
+    return buf
+  }
+
+  function css_is_used(css) {
+    return true
+    if (!css) {
+      return true
+    }
+    if (css.indexOf(':') !== -1) {
+      console.log('old css name', css)
+      css = css.replace(/:+[a-zA-Z0-9_-]+/g, '')
+      console.log('new css name', css)
+    }
+
+    let arr = css.split(',')
+    if (arr.length > 1) {
+      for (let i = 0; i < arr.length; i++) {
+        if (css_is_used(arr[i])) {
+          return true
+        }
+      }
+    } else {
+      try {
+        if (document.querySelector(css)) {
+          return true
+        }
+      } catch (e) {
+        console.log('err', css, e)
+        return true
+      }
+
+      let arr = css.split(/[ >+]/);
+      if (arr.length > 1) {
+        for (let i = 0; i < arr.length; i++) {
+          if (css_is_used(arr[i])) {
+            return true
+          }
+        }
+      }
+    }
+    return false
+  }
+
+  // Dump all document.styleSheets[*].cssRules[*].cssText to console:
+
+  (function (s, c, r, i, j) {
+    for (i = 0; i < s.length; i++) {
+      c = s[i].cssRules;
+      for (j = 0; j < c.length; j++) {
+        r = c[j].cssText;
+        console.log('document.styleSheets[' + i + '].cssRules[' + j + '].cssText = "' + r + '";')
+      }
+    }
+  })(document.styleSheets);
+
+  function check_rules() {
+    let all = []
+    let count = 0
+    //clean
+    for (let i = 0; i < document.styleSheets.length; i++) {
+      let s = document.styleSheets[i];
+      let buf = []
+      for (let j = s.cssRules.length - 1; j >= 0; j--) {
+
+        if (!css_is_used(s.cssRules[j].selectorText)) {
+          console.log('remove', s.cssRules[j].selectorText,s.cssRules[j].cssText)
+
+          s.deleteRule(j)
+        } else {
+          buf.push(s.cssRules[j].cssText)
+        }
+      }
+      if (s.cssRules.length === 0) {
+        s.disabled = true
+      }
+      if (buf.length > 0) {
+        count += buf.length
+        // all.push(css_beautify(buf.join("\n")));
+        console.log('add css', buf.join("\n"))
+        all.push(buf.join("\n"));
+      }
+
+    }
+    try {
+
+      console.log('all count', count)
+
+      let styles = document.getElementsByTagName('style');
+      console.log('before remove style len', document.getElementsByTagName('style').length)
+      let parent;
+      for (let i = styles.length - 1; i >= 0; i--) {
+        let s = styles[i]
+        // s.innerHTML = newCss
+        parent = s.parentElement
+        //parent.removeChild(s)
+      }
+      console.log('after remove style len', document.getElementsByTagName('style').length)
+      for (let i = 0; i < all.length; i++) {
+        let s = document.createElement('style')
+        s.innerHTML = all[i]
+        console.log('style', i, all[i].length)
+        parent.appendChild(s)
+      }
+      console.log('after insert style len', document.getElementsByTagName('style').length)
+    } catch (e) {
+      console.log('get e', e)
+    }
+
+  }
 
   function getHTML() {
     return new Promise(function (ok, reject) {
 
+      check_rules()
+      console.log('all js done')
+      let node = document.documentElement.cloneNode(true)
 
-        console.log('all js done')
-        let node = document.documentElement.cloneNode(true)
-        let doc = node.ownerDocument;
+      if (false) {
         let styles = node.getElementsByTagName('style');
+        let buf = []
+        let parent;
         for (let i = styles.length - 1; i >= 0; i--) {
           let s = styles[i]
           let old = s.innerHTML
           let newCss = css_beautify(old)
-          console.log('newCss', newCss, 'old', old)
-          s.innerHTML = newCss
+          split_css(newCss, buf, 1024)
+          console.log('newCss', newCss.length, 'old', old.length)
+          // s.innerHTML = newCss
+          parent = s.parentElement
+          parent.removeChild(s)
         }
-        setTimeout(function () {
-          ok('<!doctype html>\n<!-- ' + location.href + ' -->\n' + node.outerHTML);
-        }, 1000)
+        for (let i = 0; i < buf.length; i++) {
+          let s = node.ownerDocument.createElement('style')
+          s.innerHTML = buf[i]
+          console.log('append css', buf[i].length)
+          parent.appendChild(s)
+        }
+      }
+
+      setTimeout(function () {
+        ok('<!doctype html>\n<!-- ' + location.href + ' -->\n' + node.outerHTML);
+      }, 6000)
 
     })
 

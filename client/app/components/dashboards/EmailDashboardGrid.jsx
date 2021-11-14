@@ -116,7 +116,6 @@ class TableLayout extends React.Component {
       return null
     }
     let layout = props.layouts
-    console.log("get layout",layout)
     let rows = []
     while (layout.length > 0) {
       let min_y = layout[0].y;
@@ -225,7 +224,6 @@ class EmailDashboardGrid extends DashboardGrid {
       return DashboardGrid.normalizeFrom(widget)
     })
 
-    console.log('widgets constructor layouts', layouts)
     this.state = {
         layouts: layouts,
       };
