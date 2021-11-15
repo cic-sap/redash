@@ -2,21 +2,11 @@ import os.path
 import smtplib
 import time
 
-import cssutils
-
 from selenium.webdriver.common.by import By
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-
 from selenium.webdriver.support import expected_conditions as EC
 
 from selenium.webdriver.support.ui import WebDriverWait
-
-
-def get_js():
-    with open(os.path.dirname(__file__) + '/hack/css.js', encoding='utf-8') as fp:
-        text = fp.read()
-        return text
 
 
 def inject_js(driver, *files):
@@ -43,7 +33,7 @@ def run():
     snapshot(public_url, webserver, debug)
 
 
-def snapshot(public_url, webserver, debug):
+def get_options(debug: bool) -> webdriver.ChromeOptions:
     options = webdriver.ChromeOptions()
     t1 = time.time()
     if not debug:
@@ -51,21 +41,25 @@ def snapshot(public_url, webserver, debug):
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1200x1600")
+    return options
+
+
+def snapshot(public_url, webserver, debug):
+    t1 = time.time()
     driver = webdriver.Remote(
         command_executor=webserver,
-        options=options,
+        options=get_options(debug),
     )
     try:
         print('start ', public_url, 'webserver', webserver)
         driver.get(public_url)
         print('get', public_url, 'ok')
-        screen = 'new-%d.png' % time.time()
         # print('screen', screen)
         # driver.save_screenshot(screen)
-        inject_js(driver, 'hack/beautify.min.js')
+        # inject_js(driver, 'hack/beautify.min.js')
         inject_js(driver, 'hack/beautify-css.min.js')
-
-        for i in range(10):
+        title = ''
+        for i in range(30):
             print('start wait h3')
             try:
                 element = WebDriverWait(driver, 300).until(
@@ -73,11 +67,13 @@ def snapshot(public_url, webserver, debug):
                 )
                 if not element:
                     print('wait title')
+                    time.sleep(3)
                     continue
                 title = element.get_attribute('innerText').strip()
-                print('dashboard title:', element.get_attribute('innerText'), element.get_attribute('innerHTML'))
+                print('dashboard title:', title)
                 if title == '':
                     print('wait title')
+                    time.sleep(3)
                     continue
                 break
             except Exception as e:
@@ -89,26 +85,19 @@ def snapshot(public_url, webserver, debug):
         element = WebDriverWait(driver, 300).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "table.email-table-layout"))
         )
-        print('wait email-table-layout', element)
-
-        screen = 'new-%d.png' % time.time()
-        print('screen', screen)
-        # driver.save_screenshot(screen)
-
+        print('wait email-table-layout result', element)
         # //spinner
-
         out = WebDriverWait(driver, 600).until_not(
             EC.presence_of_element_located((By.CSS_SELECTOR, 'div.spinner')),
             message='wait spinner timeout'
         )
         print('get out', out)
 
-        eles = driver.find_elements(by=By.CLASS_NAME, value='visualization-renderer')
-        # eles = driver.find_elements(by=By.CLASS_NAME, value='svg-container')
-        print('find ele', len(eles))
-        for i, ele in enumerate(eles):
+        nodes = driver.find_elements(by=By.CLASS_NAME, value='visualization-renderer')
+        # nodes = driver.find_elements(by=By.CLASS_NAME, value='svg-container')
+        print('find ele', len(nodes))
+        for i, ele in enumerate(nodes):
             print('rect', i, ele.rect)
-
             check = ele.find_elements(by=By.CLASS_NAME, value='svg-container')
             if len(check) == 0:
                 print('pass', i)
@@ -120,7 +109,7 @@ def snapshot(public_url, webserver, debug):
                     '''
             print('js', js)
             driver.execute_script(js, i, )
-            time.sleep(1)
+            time.sleep(.5)
             print('snap')
             data = ele.screenshot_as_base64
             print('base64', len(data))
@@ -130,23 +119,27 @@ def snapshot(public_url, webserver, debug):
             '''
             print('js', js)
             driver.execute_script(js, i, data)
+            time.sleep(.5)
 
         try:
             inject_js(driver, 'hack/CSSOM.js', 'hack/css.js')
-
+            html = ''
             for i in range(30):
                 time.sleep(1)
                 html = driver.execute_script('return window.last_html')
-
                 if html is None or len(html) < 200:
                     print('wait html snapshot')
                     continue
                 print('get html snapshot ok')
-                f = 'test-%d.html' % time.time()
-                print('write', f, 'size', len(html), type(html))
-                with open(f, 'w', encoding='utf-8') as fp:
-                    fp.write(html)
-                send_mail(title + '-' + os.path.basename(f), html)
+                f = ''
+                email_title = title
+                if debug:
+                    f = 'test-%d.html' % time.time()
+                    email_title = title + '-' + f
+                    print('write', f, 'size', len(html), type(html))
+                    with open(f, 'w', encoding='utf-8') as fp:
+                        fp.write(html)
+                send_mail(email_title, html)
                 break
             if html is None or len(html) < 200:
                 raise Exception('wait html snapshot timeout')
@@ -180,6 +173,7 @@ def send_mail(title, html):
 
     sender_email = "dongming.shen@sap.com"
     receiver_email = "dongming.shen@sap.com"
+    # receiver_email = "dongming.shen@outlook.com"
 
     message = MIMEMultipart("alternative")
     message["Subject"] = title
@@ -205,9 +199,23 @@ def send_mail(title, html):
     pass
 
 
+def test1():
+    text = '''<style>
+        p{color:red}
+        h1{color:red}</style>
+        ''' * 10000
+    body = '''
+        <h1>hello</h1>
+        ''' * 10000
+    body = body + text
+    print('body', len(body))
+    send_mail('test-email%d' % time.time(), body)
+
+
 if __name__ == '__main__':
     # send_mail('test-test-1636683693-ok.html',open('test-1636683693-ok.html',encoding='utf-8').read())
-    # send_mail('test-1636682536-err.html',open('test-1636682536-err.html',encoding='utf-8').read())
-    for i in range(60):
-        run()
-        time.sleep(60)
+    # language:html
+    run()
+    # for i in range(60):
+    #     run()
+    #     time.sleep(60)

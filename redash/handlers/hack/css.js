@@ -98,23 +98,24 @@
       for (let i = styles.length - 1; i >= 0; i--) {
         let s = styles[i]
         // s.innerHTML = newCss
-        console.log('old css:', s.innerHTML)
-
         // split_css(css_beautify(clean_unused(s.innerHTML)), all, 150)
         all.push(css_beautify(clean_unused(s.innerHTML)))
-
+        // all.push(css_beautify(s.innerHTML))
         //s.innerHTML = clean_unused(s.innerHTML)
-        console.log('new css:', s.innerHTML)
-
+        //console.log('new css:', s.innerHTML)
         parent = s.parentElement;
         parent.removeChild(s)
       }
       for (let i = 0; i < all.length; i++) {
+        if(all[i].length===0){
+          continue
+        }
         let n = document.createElement('style')
         n.id = 'css-' + i + '-' + all[i].length;
         n.type = 'text/css';
         n.innerHTML = all[i]
         parent.appendChild(n)
+        // document.body.appendChild(n)
 
       }
 
@@ -213,12 +214,17 @@
   inlineSameOriginExternalStyles().then(function () {
     check_rules()
 
-    let cleans = document.querySelectorAll('.loading-indicator');
-    for (let i = 0; i < cleans.length; i++) {
-      let e = cleans[i];
-      e.parentElement.removeChild(e)
+    //refresh-indicator
+    function clean_elements(s){
+      let cleans = document.querySelectorAll(s);
+      for (let i = 0; i < cleans.length; i++) {
+        let e = cleans[i];
+        e.parentElement.removeChild(e)
+      }
     }
-
+    clean_elements('.loading-indicator')
+    clean_elements('.refresh-indicator')
+    clean_elements('link[rel="icon"]')
     setTimeout(function () {
       let text = node.outerHTML
       text = omitScript(text);
