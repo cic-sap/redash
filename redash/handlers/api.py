@@ -16,6 +16,7 @@ from redash.handlers.dashboards import (
     DashboardListResource,
     DashboardResource,
     DashboardShareResource,
+    DashboardEmailResource,
     DashboardTagsResource,
     PublicDashboardResource,
 )
@@ -182,6 +183,11 @@ api.add_org_resource(
     DashboardShareResource,
     "/api/dashboards/<dashboard_id>/share",
     endpoint="dashboard_share",
+)
+api.add_org_resource(
+    DashboardEmailResource,
+    "/api/dashboards/<dashboard_id>/email",
+    endpoint="dashboard_email",
 )
 
 api.add_org_resource(

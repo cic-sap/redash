@@ -14,8 +14,12 @@ x-redash-environment: &redash-environment
   REDASH_DATABASE_URL: "postgresql://postgres@postgres/postgres"
   REDASH_RATELIMIT_ENABLED: "false"
   REDASH_MAIL_DEFAULT_SENDER: "redash@example.com"
-  REDASH_MAIL_SERVER: "email"
+#  REDASH_MAIL_SERVER: "email"
+  REDASH_MAIL_SERVER: "host.docker.internal"
+#  REDASH_MAIL_PORT: "25"
+  REDASH_MAIL_PORT: "2526"
   REDASH_ENFORCE_CSRF: "true"
+  WEB_DRIVER: "http://selenium-hub:4444/wd/hub"
 services:
   server:
     <<: *redash-service

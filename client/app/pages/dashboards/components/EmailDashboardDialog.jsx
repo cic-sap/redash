@@ -16,6 +16,7 @@ import HelpTrigger from "@/components/HelpTrigger";
 import PlainButton from "@/components/PlainButton";
 
 const API_SHARE_URL = "api/dashboards/{id}/share";
+const API_EMAIL_URL = "api/dashboards/{id}/email";
 
 class EmailDashboardDialog extends React.Component {
   static propTypes = {
@@ -37,10 +38,10 @@ class EmailDashboardDialog extends React.Component {
     this.state = {
       saving: false,
       sending: false,
-      emailList: '',
+      emailList: localStorage['emailList'],
     };
 
-    this.apiUrl = replace(API_SHARE_URL, "{id}", dashboard.id);
+    this.apiUrl = replace(API_EMAIL_URL, "{id}", dashboard.id);
     this.enabled = this.props.hasOnlySafeQueries || dashboard.publicAccessEnabled;
   }
 
@@ -55,13 +56,14 @@ class EmailDashboardDialog extends React.Component {
     );
   }
 
-  enableAccess = () => {
+  sendEmail = () => {
     const {dashboard} = this.props;
     this.setState({saving: true});
 
     axios
-      .post(this.apiUrl)
+      .post(this.apiUrl,{emailList:this.state.emailList})
       .then(data => {
+        console.log('sendEmail',data)
         dashboard.publicAccessEnabled = true;
         dashboard.public_url = data.public_url;
       })
@@ -69,27 +71,10 @@ class EmailDashboardDialog extends React.Component {
         notification.error("Failed to turn on sharing for this dashboard");
       })
       .finally(() => {
-        this.setState({saving: false});
+        this.setState({sending: false})
       });
   };
 
-  disableAccess = () => {
-    const {dashboard} = this.props;
-    this.setState({saving: true});
-
-    axios
-      .delete(this.apiUrl)
-      .then(() => {
-        dashboard.publicAccessEnabled = false;
-        delete dashboard.public_url;
-      })
-      .catch(() => {
-        notification.error("Failed to turn off sharing for this dashboard");
-      })
-      .finally(() => {
-        this.setState({saving: false});
-      });
-  };
 
   onChange = checked => {
     if (checked) {
@@ -103,10 +88,10 @@ class EmailDashboardDialog extends React.Component {
     const {dialog, dashboard} = this.props;
     const onFinish = (values) => {
       console.log('Success:', values);
+      localStorage['emailList'] = values['emailList']
+
       this.setState({sending: true})
-      setTimeout(() => {
-        this.setState({sending: false})
-      },2000)
+      this.sendEmail()
     };
     return (
       <Modal {...dialog.props} title={this.constructor.headerContent} footer={null}>
