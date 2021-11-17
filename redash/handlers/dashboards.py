@@ -403,6 +403,7 @@ class DashboardEmailResource(BaseResource):
         'public/email-dashboards'
         public_url = public_url.replace('/public/dashboards/', '/public/email-dashboards/')
         public_url = public_url.replace('http://localhost:8080', 'http://server:5000')
+        public_url = public_url.replace('http://localhost:5001', 'http://server:5000')
 
 
         from redash.handlers.snapshoot import send_snapshot
