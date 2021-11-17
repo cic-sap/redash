@@ -173,10 +173,11 @@ function useDashboard(dashboardData) {
 
   const showEmailDashboardDialog = useCallback(() => {
     const handleDialogClose = () => setDashboard(currentDashboard => extend({}, currentDashboard));
-
+    let maskClosable = false;
     EmailDashboardDialog.showModal({
       dashboard,
       hasOnlySafeQueries,
+      maskClosable
     })
       .onClose(handleDialogClose)
       .onDismiss(handleDialogClose);

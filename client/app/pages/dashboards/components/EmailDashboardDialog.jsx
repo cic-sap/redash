@@ -7,6 +7,7 @@ import Modal from "antd/lib/modal";
 import Form from "antd/lib/form";
 import Input from "antd/lib/input";
 import Button from "antd/lib/button";
+import { PlusCircleOutlined,ExclamationCircleOutlined } from '@ant-design/icons';
 
 import Alert from "antd/lib/alert";
 import notification from "@/services/notification";
@@ -36,6 +37,7 @@ class EmailDashboardDialog extends React.Component {
     const {dashboard} = this.props;
 
     this.state = {
+      group: [],
       saving: false,
       sending: false,
       emailList: localStorage['emailList'],
@@ -84,6 +86,39 @@ class EmailDashboardDialog extends React.Component {
     }
   };
 
+  updateGroup=(index,key,value)=>{
+    let group = [...this.state.group]
+    let row = {...group[index]}
+    row[key]=value
+    group[index]=row
+    this.setState({group})
+  }
+
+  delGroup=(index)=>{
+    Modal.confirm({
+      maskClosable:false,
+    title: 'Confirm to delete group',
+    icon: <ExclamationCircleOutlined />,
+    content: 'Are your confirm to delete group :'+index,
+    okText: 'ok',
+      onOk:()=>{
+
+    console.log('delete ',index)
+    let group = [...this.state.group]
+    group.splice(index,1)
+    this.setState({group})
+      },
+    cancelText: 'cancel',
+  });
+
+  }
+
+  addGroup=()=>{
+
+    let group =[...this.state.group,{}]
+    this.setState({group: group});
+  }
+
   render() {
     const {dialog, dashboard} = this.props;
     const onFinish = (values) => {
@@ -112,10 +147,55 @@ class EmailDashboardDialog extends React.Component {
           <Form.Item name="emailList" label="Email list" {...this.formItemProps}>
             <Input.TextArea multiple={true} rows={4} cols={20}/>
           </Form.Item>
+
           <Form.Item   {...this.formItemProps} wrapperCol={{
             offset: 8,
             span: 16,
           }}>
+            {this.state.group.map((row,index)=>{
+              return (
+                <table key={'group'+index}>
+                  <tbody>
+                  <tr>
+                    <td>email list</td>
+                    <td>
+                      <Input.TextArea multiple={true}
+                                      rows={4}
+                                      cols={20}
+                            value={row.email?row.email:''} onChange={(e)=>{
+                      this.updateGroup(index,'email',e.target.value)
+                    }}
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>cronjob</td>
+                    <td><Input value={row.cronjob?row.cronjob:''} onChange={(e)=>{
+                      this.updateGroup(index,'cronjob',e.target.value)
+                    }} /></td>
+                  </tr>
+                  <tr>
+                    <td>params</td>
+                    <td>
+
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td>
+                      <Button htmlType="button" onClick={()=>this.delGroup(index)} >del</Button>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              )
+            })}
+              <Form.Item   {...this.formItemProps} wrapperCol={{
+            offset: 8,
+            span: 16,
+          }}>
+            <Button htmlType="button" onClick={this.addGroup} >add</Button>
+          </Form.Item>
             <Button htmlType="submit" loading={this.state.sending}>Send Now</Button>
           </Form.Item>
         </Form>
@@ -124,4 +204,7 @@ class EmailDashboardDialog extends React.Component {
   }
 }
 
+class EmailGroup{
+
+}
 export default wrapDialog(EmailDashboardDialog);
