@@ -217,6 +217,7 @@ class VisualizationWidget extends React.Component {
     isLoading: PropTypes.bool,
     canEdit: PropTypes.bool,
     isEditing: PropTypes.bool,
+    tableLayout: PropTypes.bool,
     onLoad: PropTypes.func,
     onRefresh: PropTypes.func,
     onDelete: PropTypes.func,
@@ -293,6 +294,7 @@ class VisualizationWidget extends React.Component {
           <div className="body-row-auto scrollbox">
             <VisualizationRenderer
               visualization={widget.visualization}
+              tableLayout={this.props.tableLayout}
               queryResult={widgetQueryResult}
               filters={filters}
               onFiltersChange={this.onLocalFiltersChange}

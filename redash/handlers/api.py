@@ -16,6 +16,7 @@ from redash.handlers.dashboards import (
     DashboardListResource,
     DashboardResource,
     DashboardShareResource,
+    DashboardEmailResource,
     DashboardTagsResource,
     PublicDashboardResource,
 )
@@ -76,6 +77,7 @@ from redash.handlers.query_snippets import (
     QuerySnippetResource,
 )
 from redash.handlers.settings import OrganizationSettings
+from redash.handlers.subscribe import EmailSubscriptionResource
 from redash.handlers.users import (
     UserDisableResource,
     UserInviteResource,
@@ -125,8 +127,49 @@ api.add_org_resource(
     "/api/alerts/<alert_id>/subscriptions/<subscriber_id>",
     endpoint="alert_subscription",
 )
+'''
+
+curl -v  'http://localhost:8080/api/email-subscription/1' \
+  -X 'POST' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Length: 0' \
+  -H 'sec-ch-ua: "Google Chrome";v="95", "Chromium";v="95", ";Not A Brand";v="99"' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'DNT: 1' \
+  -H 'X-CSRF-TOKEN: ImIxYmRjMTc0OGYzYjEwZTU2YTc3YjM1ZjgxZWQ5YmYyN2RjMGJlYzMi.YYIeyg.-PLsMcMFyo0lg7Rww8dwPIw7bFU' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'Origin: http://localhost:8080' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Referer: http://localhost:8080/dashboards/1-test1' \
+  -H 'Accept-Language: en,zh-CN;q=0.9,zh;q=0.8' \
+  -H 'Cookie: metabase.DEVICE=100e43d3-649c-4280-8d8b-72527c6bfad1; _ga=GA1.1.295563659.1634353309; metabase.SESSION=ee4885e4-a660-4e17-bfce-2b1a1005d088; remember_token=1-10f0557b308d87ea645e1e7fffba7a08|f9b050ca37acbaa00d40dc76465378d98c90f3b9e5fcbb18dd0ef9613e71c85c6794311b2225aaf4e5b08224fd8ea71ebe97a6521a77361f1eca35cb7b59b393; csrf_token=ImIxYmRjMTc0OGYzYjEwZTU2YTc3YjM1ZjgxZWQ5YmYyN2RjMGJlYzMi.YYIeyg.-PLsMcMFyo0lg7Rww8dwPIw7bFU; session=.eJw1z0tqA0EMRdG91DgBqX6SvJmmVJJICOmE7vbIZO8pMJ5fHuc90haHnx_pdh13f0vbp6VbKj0EhdhQBFXcWRyigGolRpMOUpmmYCjoiBwhnmU1UkQDOw2qMqP14gLsVc1KNO5qPgpS7rM3QotRJhMr1RyQG4QNVZ2lpwX59eN77L5fL9o8j9iuny_fl1BRbSJVjqII3vog0tKC0W0RMtkE9VnW0v3043kL3xECWlslsDH56LU5OkWEDhrA6e8fhC9Pxg.YYIeyg.5c_3BQdSLmTO9sbDXwSdq0WQwVs' \
+  --compressed -d '{"email_list":"dongming.shen@sap.com"}'
+
+curl -X POST 'http://localhost:8080/api/email-subscription/1' \
+  -H 'Connection: keep-alive' \
+  -H 'sec-ch-ua: "Google Chrome";v="95", "Chromium";v="95", ";Not A Brand";v="99"' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'DNT: 1' \
+  -H 'X-CSRF-TOKEN: ImIxYmRjMTc0OGYzYjEwZTU2YTc3YjM1ZjgxZWQ5YmYyN2RjMGJlYzMi.YYIcZw.f2nigncW9QFcbF-18p46_V5g56k' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Referer: http://localhost:8080/dashboards/1-test1' \
+  -H 'Accept-Language: en,zh-CN;q=0.9,zh;q=0.8' \
+  -H 'Cookie: metabase.DEVICE=100e43d3-649c-4280-8d8b-72527c6bfad1; _ga=GA1.1.295563659.1634353309; metabase.SESSION=ee4885e4-a660-4e17-bfce-2b1a1005d088; remember_token=1-10f0557b308d87ea645e1e7fffba7a08|f9b050ca37acbaa00d40dc76465378d98c90f3b9e5fcbb18dd0ef9613e71c85c6794311b2225aaf4e5b08224fd8ea71ebe97a6521a77361f1eca35cb7b59b393; csrf_token=ImIxYmRjMTc0OGYzYjEwZTU2YTc3YjM1ZjgxZWQ5YmYyN2RjMGJlYzMi.YYIcZw.f2nigncW9QFcbF-18p46_V5g56k; session=.eJw1z0tqA0EMRdG91DgBqX6SvJmmVJJICOmE7vbIZO8pMJ5fHuc90haHnx_pdh13f0vbp6VbKj0EhdhQBFXcWRyigGolRpMOUpmmYCjoiBwhnmU1UkQDOw2qMqP14gLsVc1KNO5qPgpS7rM3QotRJhMr1RyQG4QNVZ2lpwX59eN77L5fL9o8j9iuny_fl1BRbSJVjqII3vog0tKC0W0RMtkE9VnW0v3043kL3xECWlslsDH56LU5OkWEDhrA6e8fhC9Pxg.YYIcZw.aN2igqWxezSPUP7-mWrZEqT5Nt4' \
+  --compressed -d '{"email_list":"dongming.shen@sap.com"}'
+
+  '''
 api.add_org_resource(AlertListResource, "/api/alerts", endpoint="alerts")
 
+api.add_org_resource(EmailSubscriptionResource, "/api/email-subscription/<dashboard_id>", endpoint="email-subscription")
 api.add_org_resource(DashboardListResource, "/api/dashboards", endpoint="dashboards")
 api.add_org_resource(
     DashboardResource, "/api/dashboards/<dashboard_id>", endpoint="dashboard"
@@ -140,6 +183,11 @@ api.add_org_resource(
     DashboardShareResource,
     "/api/dashboards/<dashboard_id>/share",
     endpoint="dashboard_share",
+)
+api.add_org_resource(
+    DashboardEmailResource,
+    "/api/dashboards/<dashboard_id>/email",
+    endpoint="dashboard_email",
 )
 
 api.add_org_resource(

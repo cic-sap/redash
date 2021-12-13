@@ -23,7 +23,6 @@ from redash.serializers import (
 )
 from sqlalchemy.orm.exc import StaleDataError
 
-
 # Ordering map for relationships
 order_map = {
     "name": "lowercase_name",
@@ -373,6 +372,53 @@ class DashboardShareResource(BaseResource):
                 "object_type": "dashboard",
             }
         )
+
+
+class DashboardEmailResource(BaseResource):
+    def post(self, dashboard_id):
+        """
+        Allow anonymous access to a dashboard.
+
+        :param dashboard_id: The numeric ID of the dashboard to share.
+        :>json string public_url: The URL for anonymous access to the dashboard.
+        :>json api_key: The API key to use when accessing it.
+        """
+
+        data = request.get_json(force=True)
+        print('get request info:', data)
+        email = data['emailList']
+        print('get request email:', email)
+        dashboard = models.Dashboard.get_by_id_and_org(dashboard_id, self.current_org)
+        require_admin_or_owner(dashboard.user_id)
+        api_key = models.ApiKey.get_by_object(dashboard)
+        models.db.session.flush()
+        models.db.session.commit()
+
+        public_url = url_for(
+            "redash.public_dashboard",
+            token=api_key.api_key,
+            org_slug=self.current_org.slug,
+            _external=True,
+        )
+        'public/email-dashboards'
+        public_url = public_url.replace('/public/dashboards/', '/public/email-dashboards/')
+        public_url = public_url.replace('http://localhost:8080', 'http://server:5000')
+        public_url = public_url.replace('http://localhost:5001', 'http://server:5000')
+
+
+        from redash.handlers.snapshoot import send_snapshot
+
+        send_snapshot(email=email,public_url=public_url)
+        self.record_event(
+            {
+                "action": "send_email",
+                "object_id": dashboard.id,
+                "object_type": "dashboard",
+            }
+        )
+
+        print('get email post info')
+        return {"public_url": public_url, "api_key": api_key.api_key}
 
 
 class DashboardTagsResource(BaseResource):

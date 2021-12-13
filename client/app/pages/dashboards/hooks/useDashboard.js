@@ -12,6 +12,7 @@ import TextboxDialog from "@/components/dashboards/TextboxDialog";
 import PermissionsEditorDialog from "@/components/PermissionsEditorDialog";
 import { editableMappingsToParameterMappings, synchronizeWidgetTitles } from "@/components/ParameterMappingInput";
 import ShareDashboardDialog from "../components/ShareDashboardDialog";
+import EmailDashboardDialog from "../components/EmailDashboardDialog";
 import useFullscreenHandler from "../../../lib/hooks/useFullscreenHandler";
 import useRefreshRateHandler from "./useRefreshRateHandler";
 import useEditModeHandler from "./useEditModeHandler";
@@ -169,6 +170,23 @@ function useDashboard(dashboardData) {
       .onDismiss(handleDialogClose);
   }, [dashboard, hasOnlySafeQueries]);
 
+
+  const showEmailDashboardDialog = useCallback(() => {
+    const handleDialogClose = () => setDashboard(currentDashboard => extend({}, currentDashboard));
+    let maskClosable = false;
+    EmailDashboardDialog.showModal({
+      dashboard,
+      hasOnlySafeQueries,
+      maskClosable
+    })
+      .onClose(handleDialogClose)
+      .onDismiss(handleDialogClose);
+  }, [dashboard, hasOnlySafeQueries]);
+
+
+
+
+
   const showAddTextboxDialog = useCallback(() => {
     TextboxDialog.showModal({
       isNew: true,
@@ -240,6 +258,7 @@ function useDashboard(dashboardData) {
     fullscreen,
     toggleFullscreen,
     showShareDashboardDialog,
+    showEmailDashboardDialog,
     showAddTextboxDialog,
     showAddWidgetDialog,
     managePermissions,

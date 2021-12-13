@@ -70,6 +70,7 @@ class Widget extends React.Component {
     footer: PropTypes.node,
     canEdit: PropTypes.bool,
     isPublic: PropTypes.bool,
+    tableLayout: PropTypes.bool,
     refreshStartedAt: Moment,
     menuOptions: PropTypes.node,
     tileProps: PropTypes.object, // eslint-disable-line react/forbid-prop-types
@@ -108,9 +109,43 @@ class Widget extends React.Component {
     });
   };
 
+  renderTableLayout(){
+    const { className, children, header, footer, tileProps } = this.props;
+    return (
+      <div className="widget-wrapper">
+        <div className={cx("tile body-container", className)} {...tileProps}>
+        <table style={{height:'100%',width:'100%'}} className="table-widget-wrap">
+          <tbody>
+          {header && (
+          <tr>
+            <td height={60}><div className="body-row widget-header" style={{padding: '10px'}}>{header}</div></td>
+          </tr>
+          )}
+          <tr>
+            <td className="widget-body-td">
+              {children}
+            </td>
+          </tr>
+          {footer && (
+            <tr>
+            <td height={50}>
+              <div className="body-row tile__bottom-control">{footer}</div>
+            </td>
+          </tr>
+          )}
+          </tbody>
+        </table>
+        </div>
+      </div>
+    );
+  }
   render() {
     const { className, children, header, footer, canEdit, isPublic, menuOptions, tileProps } = this.props;
     const showDropdownButton = !isPublic && (canEdit || !isEmpty(menuOptions));
+    if(this.props.tableLayout){
+      return this.renderTableLayout()
+    }
+
     return (
       <div className="widget-wrapper">
         <div className={cx("tile body-container", className)} {...tileProps}>
